@@ -1,72 +1,58 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const StartStoryScreen = ({ navigation }) => {
+const StartStoryScreen = () => {
+  const navigation = useNavigation();
+  const [themes, setThemes] = useState([]);
   const [selectedTheme, setSelectedTheme] = useState('');
-  const [selectedAdventureOption, setSelectedAdventureOption] = useState('');
-  const [characterName, setCharacterName] = useState('');
+  const [selectedCharacters, setSelectedCharacters] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState('');
 
-  const handleThemeSelection = (theme) => {
-    setSelectedTheme(theme);
-    if (theme === 'Adventure') {
-      // If Adventure theme is selected, navigate to AdventureOptionsScreen
-      navigation.navigate('AdventureOptions');
-    } else {
-      // For other themes, you can handle the logic as per your requirement
-      // You can navigate to the next screen or perform any other action
+  useEffect(() => {
+    fetchThemes();
+  }, []);
+
+  const fetchThemes = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5000/themes');
+      const data = await response.json();
+      setThemes(data);
+    } catch (error) {
+      console.error('Error fetching themes:', error);
     }
   };
 
-  const handleAdventureOptionSelection = (option) => {
-    setSelectedAdventureOption(option);
-    // Navigate to the screen where the user can add characters
-    navigation.navigate('AddCharacters');
+  const handleThemeSelection = (theme) => {
+    setSelectedTheme(theme);
   };
 
-  const handleCharacterNameInput = (name) => {
-    setCharacterName(name);
-    // Once the character name is selected, you can proceed to generate the story
-    // You can navigate to the next screen or perform any other action
+  const handleNext = () => {
+    navigation.navigate('AddCharacters', { // Navigate to "AddCharacters" screen
+      theme: selectedTheme,
+      characters: selectedCharacters,
+      location: selectedLocation,
+    });
   };
+  
 
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Select a Theme:</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Sci-Fi')}
-      >
-        <Text style={styles.buttonText}>Sci-Fi</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Fairy Tale')}
-      >
-        <Text style={styles.buttonText}>Fairy Tale</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Poetry')}
-      >
-        <Text style={styles.buttonText}>Poetry</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Fable')}
-      >
-        <Text style={styles.buttonText}>Fable</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Adventure')}
-      >
-        <Text style={styles.buttonText}>Adventure</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => handleThemeSelection('Mystery')}
-      >
-        <Text style={styles.buttonText}>Mystery</Text>
+      {themes.map((theme) => (
+        <TouchableOpacity
+          key={theme}
+          style={[
+            styles.button,
+            theme === selectedTheme && styles.selectedButton,
+          ]}
+          onPress={() => handleThemeSelection(theme)}
+        >
+          <Text style={styles.buttonText}>{theme}</Text>
+        </TouchableOpacity>
+      ))}
+      <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+        <Text style={styles.nextButtonText}>Next: Characters</Text>
       </TouchableOpacity>
     </View>
   );
@@ -77,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FDF6E3', // Set your desired background color
+    backgroundColor: '#FDF6E3',
     padding: 20,
   },
   heading: {
@@ -87,14 +73,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#FFC0CB', // Set your desired button color
+    backgroundColor: '#FFC0CB',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 20,
     marginBottom: 20,
   },
+  selectedButton: {
+    borderWidth: 2,
+    borderColor: '#FF69B4',
+  },
   buttonText: {
-    color: '#FFF', // Set your desired button text color
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  nextButton: {
+    backgroundColor: '#FFC0CB',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    width: '100%',
+  },
+  nextButtonText: {
+    color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -102,6 +105,3 @@ const styles = StyleSheet.create({
 });
 
 export default StartStoryScreen;
-
-
-// You can add additional screens like AdventureOptionsScreen and AddCharactersScreen to handle the further options and character selection. Remember to update the navigation.navigate calls 
