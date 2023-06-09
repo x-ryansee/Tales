@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const ChooseLocationScreen = () => {
   const navigation = useNavigation();
   const [selectedLocation, setSelectedLocation] = useState('');
   const [locations, setLocations] = useState([]);
+  const route = useRoute();
 
   useEffect(() => {
     fetchLocations();
@@ -26,8 +27,12 @@ const ChooseLocationScreen = () => {
   };
 
   const handleGenerateStory = () => {
-    // Perform any logic with the selected location
-    navigation.navigate('Story', { location: selectedLocation });
+    const { theme, characters } = route.params; // Get the theme and characters from the route params
+    navigation.navigate('Story', {
+      theme: theme,
+      characters: characters,
+      location: selectedLocation
+    });
   };
 
   return (

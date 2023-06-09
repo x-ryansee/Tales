@@ -27,6 +27,7 @@ const AddCharactersScreen = () => {
     navigation.navigate('ChooseLocation', {
       theme: route.params.theme,
       characters: selectedCharacters,
+      location: '', // Set an empty location for now
     });
   };
 

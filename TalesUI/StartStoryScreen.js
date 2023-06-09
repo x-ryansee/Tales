@@ -27,13 +27,36 @@ const StartStoryScreen = () => {
     setSelectedTheme(theme);
   };
 
-  const handleNext = () => {
-    navigation.navigate('AddCharacters', { // Navigate to "AddCharacters" screen
-      theme: selectedTheme,
-      characters: selectedCharacters,
-      location: selectedLocation,
-    });
+  const handleNext = async () => {
+    try {
+      const story = {
+        theme: selectedTheme,
+        characters: selectedCharacters,
+        location: selectedLocation,
+      };
+  
+      const response = await fetch('http://127.0.0.1:5000/stories', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(story),
+      });
+  
+      if (response.ok) {
+        navigation.navigate('AddCharacters', {
+          theme: selectedTheme,
+          characters: selectedCharacters,
+          location: selectedLocation,
+        });
+      } else {
+        console.error('Failed to create story:', response.status);
+      }
+    } catch (error) {
+      console.error('Error creating story:', error);
+    }
   };
+  
   
 
   return (
