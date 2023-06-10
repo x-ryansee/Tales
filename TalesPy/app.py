@@ -1,4 +1,11 @@
 from flask import Flask, jsonify, request
+from story_generation import generate_story
+from book_extractor import (
+    extract_alices_adventures_in_wonderland,
+    extract_the_great_gatsby,
+    extract_the_adventures_of_roderick_random,
+    extract_the_adventures_of_sherlock_holmes
+)
 
 app = Flask(__name__)
 
@@ -32,7 +39,7 @@ def get_characters():
 def get_locations():
     return jsonify(locations)
 
-# Route to save the selected theme, characters, and location
+# Route to save the selected theme, characters, and location and generate a story
 @app.route('/stories', methods=['POST'])
 def create_story():
     # Get the story details from the request body
@@ -46,8 +53,11 @@ def create_story():
     selected_characters.extend(characters)
     selected_location.append(location)
 
-    # Return a response indicating successful story creation
-    return jsonify({'message': 'Story created successfully'})
+    # Generate the story based on the selected theme, characters, and location
+    generated_story = generate_story(theme, characters, location)
+
+    # Return the generated story as the response
+    return jsonify({'story': generated_story})
 
 if __name__ == '__main__':
     app.run()
